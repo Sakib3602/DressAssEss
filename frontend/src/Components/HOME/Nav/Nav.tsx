@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, User, ShoppingBag, ChevronDown, Menu, X, ArrowRight } from "lucide-react";
+import {  User, ShoppingBag, ChevronDown, Menu, X, ArrowRight } from "lucide-react";
 
 // ⚠️ আপনার logo file অনুযায়ী path ঠিক করে নিন
 import logo from "../../../assets/logo.png";
@@ -103,10 +103,7 @@ export default function Nav() {
 
           {/* -------- Right: Icons & Mobile Menu Toggle -------- */}
           <div className="flex-1 flex justify-end items-center gap-5 md:gap-7">
-            {/* Desktop Icons */}
-            <button aria-label="Search" className="text-gray-800 hover:text-gray-500 transition-colors hidden sm:block">
-              <Search size={22} strokeWidth={1.5} />
-            </button>
+            
             <a
               href="/account"
               aria-label="Account"
