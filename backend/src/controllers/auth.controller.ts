@@ -11,7 +11,7 @@ export const register = async (req: Request, res: Response) => {
     if (existingUser) {
       return res
         .status(400)
-        .json({ message: "এই phone number দিয়ে user আগে থেকেই আছে" });
+        .json({ message: "A user with this phone number already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,16 +35,16 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await prisma.user.findUnique({ where: { phone } });
     if (!user) {
-      return res.status(400).json({ message: "User খুঁজে পাওয়া যায়নি" });
+      return res.status(400).json({ message: "User not found" });
     }
 
     if (!user.isActive) {
-      return res.status(403).json({ message: "Account inactive আছে" });
+      return res.status(403).json({ message: "Account inactive" });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Password ভুল" });
+      return res.status(400).json({ message: "Invalid password" });
     }
 
     const token = jwt.sign(
@@ -53,9 +53,16 @@ export const login = async (req: Request, res: Response) => {
       { expiresIn: "7d" }
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
     res.status(200).json({
       message: "Login successful",
-      token,
       user: { id: user.id, name: user.name, phone: user.phone, role: user.role },
     });
   } catch (error) {

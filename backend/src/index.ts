@@ -5,13 +5,18 @@ import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
 app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Server চলছে ✅");
+  res.send("Server is running  ✅");
 });
 
 const PORT = process.env.PORT || 5000;
