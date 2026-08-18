@@ -7,18 +7,265 @@ datasource db {
   provider = "postgresql"
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  phone     String   @unique
-  password  String
-  isActive  Boolean  @default(true)
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+// ---------------- ENUMS ----------------
 
 enum Role {
-  USER
   ADMIN
+  CUSTOMER
+}
+
+enum PaymentMethod {
+  COD
+  BKASH
+  NAGAD
+  CARD
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+  RETURNED
+}
+
+// ---------------- USER ----------------
+
+model User {
+  id       String  @id @default(uuid())
+  name     String
+  email    String  @unique
+  password String
+  phone    String?
+  role     Role    @default(CUSTOMER)
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdProducts Product[]    @relation("ProductCreatedBy")
+  createdCombos   ComboOffer[] @relation("ComboCreatedBy")
+  orders          Order[]
+  payments        Payment[]
+
+  @@map("users")
+}
+
+// ---------------- CATEGORY (flat, no subcategory) ----------------
+
+model Category {
+  id           String  @id @default(uuid())
+  name         String  @unique
+  slug         String  @unique
+  description  String?
+  image        String?
+  displayOrder Int     @default(0)
+  isActive     Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products Product[]
+
+  @@map("categories")
+}
+
+// ---------------- PRODUCT ----------------
+
+model Product {
+  id               String  @id @default(uuid())
+  name             String
+  slug             String  @unique
+  description      String
+  shortDescription String?
+  brand            String?
+
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  images String[]
+
+  price         Decimal @db.Decimal(10, 2)
+  discountPrice Decimal? @db.Decimal(10, 2)
+
+  variants   ProductVariant[]
+  totalStock Int              @default(0)
+
+  material         String?
+  careInstructions String?
+
+  isBestseller Boolean @default(false)
+
+  ratingAverage Float @default(0)
+  ratingCount   Int   @default(0)
+
+  isActive Boolean @default(true)
+
+  createdById String?
+  createdBy   User?   @relation("ProductCreatedBy", fields: [createdById], references: [id])
+
+  orderItems OrderItem[]
+  comboItems ComboItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId, isActive])
+  @@index([isBestseller])
+  @@map("products")
+}
+
+model ProductVariant {
+  id        String  @id @default(uuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  size      String
+  color     String
+  colorCode String?
+  stock     Int     @default(0)
+  sku       String? @unique
+
+  orderItems OrderItem[]
+  comboItems ComboItem[]
+
+  @@unique([productId, size, color])
+  @@map("product_variants")
+}
+
+// ---------------- COMBO OFFER ----------------
+
+model ComboOffer {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  images      String[]
+
+  items ComboItem[]
+
+  originalPrice Decimal @db.Decimal(10, 2)
+  comboPrice    Decimal @db.Decimal(10, 2)
+
+  isActive Boolean @default(true)
+
+  createdById String?
+  createdBy   User?   @relation("ComboCreatedBy", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@map("combo_offers")
+}
+
+model ComboItem {
+  id      String     @id @default(uuid())
+  comboId String
+  combo   ComboOffer @relation(fields: [comboId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+  size     String
+  color    String
+  quantity Int    @default(1)
+
+  @@map("combo_items")
+}
+
+// ---------------- ORDER ----------------
+
+model Order {
+  id     String  @id @default(uuid())
+  userId String? // ← optional করা হলো, guest checkout এর জন্য
+  user   User?   @relation(fields: [userId], references: [id])
+
+  orderItems OrderItem[]
+
+  // এই ফিল্ডগুলা already আছে — guest হলে এগুলাই identity হিসেবে কাজ করবে
+  shippingFullName    String
+  shippingPhone       String
+  shippingAddressLine String
+  shippingCity        String
+  shippingArea        String?
+  shippingPostalCode  String?
+
+  // guest checkout হলে email ও রাখা ভালো, order confirmation পাঠানোর জন্য
+  guestEmail String?
+
+  itemsPrice     Decimal @db.Decimal(10, 2)
+  shippingPrice  Decimal @default(0) @db.Decimal(10, 2)
+  discountAmount Decimal @default(0) @db.Decimal(10, 2)
+  totalPrice     Decimal @db.Decimal(10, 2)
+
+  paymentMethod PaymentMethod
+  isPaid        Boolean       @default(false)
+  payment       Payment?
+
+  orderStatus  OrderStatus @default(PENDING)
+  deliveredAt  DateTime?
+  cancelReason String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@index([orderStatus])
+  @@map("orders")
+}
+model OrderItem {
+  id      String @id @default(uuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  variantId String
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+
+  name     String
+  image    String
+  size     String
+  color    String
+  quantity Int
+  price    Decimal @db.Decimal(10, 2)
+
+  @@map("order_items")
+}
+
+// ---------------- PAYMENT ----------------
+
+model Payment {
+  id      String @id @default(uuid())
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id])
+
+  userId String? // ← optional
+  user   User?   @relation(fields: [userId], references: [id])
+
+  amount Decimal       @db.Decimal(10, 2)
+  method PaymentMethod
+  status PaymentStatus @default(PENDING)
+
+  transactionId   String?
+  gatewayResponse Json?
+  paidAt          DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("payments")
 }

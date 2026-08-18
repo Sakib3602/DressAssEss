@@ -1,10 +1,10 @@
-import Hero from "./Components/HOME/Hero/Hero";
+import MainHome from "./Components/HOME/MainHome/MainHome";
 import Nav from "./Components/HOME/Nav/Nav";
 
 const App = () => {
   return <>
   <Nav></Nav>
-  <Hero></Hero>
+  <MainHome></MainHome>
   </>
 };
 
