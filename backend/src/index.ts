@@ -12,16 +12,18 @@ app.use(
     credentials: true,
   })
 );
+
 app.use(express.json());
-app.use(cookieParser()); 
+app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Server is running  ✅");
+  res.send("Server is running ✅");
 });
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const PORT = Number(process.env.PORT) || 5000;
+
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
 });
