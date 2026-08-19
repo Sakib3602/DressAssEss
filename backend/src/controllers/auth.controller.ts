@@ -6,20 +6,16 @@ import prisma from "../config/prisma.js";
 export const register = async (req: Request, res: Response) => {
   try {
     const { name, phone, password } = req.body;
-
     const existingUser = await prisma.user.findUnique({ where: { phone } });
     if (existingUser) {
       return res
         .status(400)
         .json({ message: "A user with this phone number already exists" });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const user = await prisma.user.create({
       data: { name, phone, password: hashedPassword },
     });
-
     res.status(201).json({
       message: "User created successfully",
       user: { id: user.id, name: user.name, phone: user.phone, role: user.role },
@@ -32,27 +28,22 @@ export const register = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   try {
     const { phone, password } = req.body;
-
     const user = await prisma.user.findUnique({ where: { phone } });
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-
     if (!user.isActive) {
       return res.status(403).json({ message: "Account inactive" });
     }
-
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: "Invalid password" });
     }
-
     const token = jwt.sign(
       { id: user.id, role: user.role },
       process.env.JWT_SECRET as string,
       { expiresIn: "7d" }
     );
-
     res.cookie("token", token, {
       httpOnly: true,
       secure: false,
@@ -60,7 +51,6 @@ export const login = async (req: Request, res: Response) => {
       path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-
     res.status(200).json({
       message: "Login successful",
       user: { id: user.id, name: user.name, phone: user.phone, role: user.role },
@@ -68,4 +58,43 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ message: "Server error", error: (error as Error).message });
   }
+};
+
+// @desc   বর্তমানে cookie দিয়ে কে login করা আছে সেটা চেক করা — page refresh এর পর
+//         frontend AuthContext এইটা কল করে login state ধরে রাখবে
+// @route  GET /api/auth/me
+export const getMe = async (req: Request, res: Response) => {
+  try {
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      select: { id: true, name: true, phone: true, role: true, isActive: true },
+    });
+
+    if (!user || !user.isActive) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+};
+
+// @desc   Logout — cookie clear করে দেয়
+// @route  POST /api/auth/logout
+export const logout = async (req: Request, res: Response) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+    path: "/",
+  });
+  res.status(200).json({ message: "Logged out successfully" });
 };

@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import {  User, ShoppingBag, ChevronDown, Menu, X, ArrowRight } from "lucide-react";
+// ড্যাশবোর্ড এবং লগআউটের জন্য নতুন আইকন ইম্পোর্ট করা হলো
+import { User, UserCog, ShoppingBag, ChevronDown, Menu, X, ArrowRight, LayoutDashboard, LogOut } from "lucide-react";
 
-// ⚠️ আপনার logo file অনুযায়ী path ঠিক করে নিন
+// ⚠️ আপনার logo file অনুযায়ী path ঠিক করে নিন
 import logo from "../../../assets/logo.png";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../../AUTH/Authcontext";
 
 const shopCategories = [
   "All Products",
@@ -21,6 +24,21 @@ export default function Nav() {
   const [shopOpen, setShopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileShopOpen, setMobileShopOpen] = useState(false);
+  
+  // logout ফাংশনটিও আনা হলো
+  const { user, logout } = useAuth(); 
+  const navigate = useNavigate();
+
+  // Role and active status validation
+  const isAdmin = user && user.isActive === true && user.role === "ADMIN";
+  const isCustomer = user && (user.role === "USER" || user.role === "CUSTOMER");
+
+  const handleLogout = () => {
+    if (logout) {
+      logout();
+    }
+    navigate("/login");
+  };
 
   // Prevent body scrolling when full-screen mobile menu is open
   useEffect(() => {
@@ -34,7 +52,6 @@ export default function Nav() {
   return (
     <>
       <nav className="w-full bg-white border-b border-gray-100">
-        {/* Hero সেকশনের সাথে অ্যালাইন করার জন্য max-w-[1536px] এবং mx-auto দেওয়া হয়েছে */}
         <div className="max-w-[1536px] mx-auto px-6 lg:px-12 flex items-center justify-between h-24 md:h-28">
           
           {/* -------- Left: Logo -------- */}
@@ -104,13 +121,30 @@ export default function Nav() {
           {/* -------- Right: Icons & Mobile Menu Toggle -------- */}
           <div className="flex-1 flex justify-end items-center gap-5 md:gap-7">
             
-            <a
-              href="/account"
-              aria-label="Account"
-              className="text-gray-800 hover:text-gray-500 transition-colors hidden sm:block"
-            >
-              <User size={22} strokeWidth={1.5} />
-            </a>
+            {/* User Logic Implementation for Desktop */}
+            {isAdmin ? (
+              <div className="hidden sm:flex items-center gap-5">
+                <Link to="/admin" aria-label="Admin Dashboard" className="text-gray-800 hover:text-gray-500 transition-colors">
+                  <UserCog size={22} strokeWidth={1.5} />
+                </Link>
+                <button onClick={handleLogout} aria-label="Logout" className="text-rose-600 hover:text-rose-400 transition-colors">
+                  <LogOut size={22} strokeWidth={1.5} />
+                </button>
+              </div>
+            ) : isCustomer ? (
+              <div className="hidden sm:flex items-center gap-5">
+                <Link to="/account" aria-label="Dashboard" className="text-gray-800 hover:text-gray-500 transition-colors">
+                  <LayoutDashboard size={22} strokeWidth={1.5} />
+                </Link>
+                <button onClick={handleLogout} aria-label="Logout" className="text-rose-600 hover:text-rose-400 transition-colors">
+                  <LogOut size={22} strokeWidth={1.5} />
+                </button>
+              </div>
+            ) : (
+              <Link to="/login" aria-label="Login" className="text-gray-800 hover:text-gray-500 transition-colors hidden sm:block">
+                <User size={22} strokeWidth={1.5} />
+              </Link>
+            )}
             
             {/* Cart Icon */}
             <a
@@ -181,11 +215,36 @@ export default function Nav() {
           <a href="/combo-offers" className="text-2xl font-light text-gray-800 hover:text-gray-500 transition-colors tracking-wide">Combo Offers</a>
         </div>
 
+        {/* User Logic Implementation for Mobile Bottom Bar */}
         <div className="p-6 bg-gray-50 flex items-center justify-center gap-8 border-t border-gray-100">
-          <a href="/account" className="flex flex-col items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
-            <User size={24} strokeWidth={1.5} />
-            <span className="text-xs uppercase tracking-widest font-medium">Account</span>
-          </a>
+          {isAdmin ? (
+            <>
+              <Link to="/admin" className="flex flex-col items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+                <UserCog size={24} strokeWidth={1.5} />
+                <span className="text-xs uppercase tracking-widest font-medium">Admin</span>
+              </Link>
+              <button onClick={handleLogout} className="flex flex-col items-center gap-2 text-rose-500 hover:text-rose-700 transition-colors">
+                <LogOut size={24} strokeWidth={1.5} />
+                <span className="text-xs uppercase tracking-widest font-medium">Logout</span>
+              </button>
+            </>
+          ) : isCustomer ? (
+            <>
+              <Link to="/account" className="flex flex-col items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+                <LayoutDashboard size={24} strokeWidth={1.5} />
+                <span className="text-xs uppercase tracking-widest font-medium">Dashboard</span>
+              </Link>
+              <button onClick={handleLogout} className="flex flex-col items-center gap-2 text-rose-500 hover:text-rose-700 transition-colors">
+                <LogOut size={24} strokeWidth={1.5} />
+                <span className="text-xs uppercase tracking-widest font-medium">Logout</span>
+              </button>
+            </>
+          ) : (
+            <Link to="/login" className="flex flex-col items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+              <User size={24} strokeWidth={1.5} />
+              <span className="text-xs uppercase tracking-widest font-medium">Login</span>
+            </Link>
+          )}
         </div>
       </div>
     </>

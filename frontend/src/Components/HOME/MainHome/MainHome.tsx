@@ -1,4 +1,5 @@
 import BestSeller from "../BestSeller/BestSeller";
+import Footer from "../Footer";
 import Hero from "../Hero/Hero";
 
 
@@ -8,6 +9,8 @@ const MainHome = () => {
         <>
         <Hero></Hero>
         <BestSeller></BestSeller>
+
+        <Footer></Footer>
             
         </>
     );
