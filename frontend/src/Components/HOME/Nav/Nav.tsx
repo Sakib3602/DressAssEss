@@ -124,7 +124,7 @@ export default function Nav() {
             {/* User Logic Implementation for Desktop */}
             {isAdmin ? (
               <div className="hidden sm:flex items-center gap-5">
-                <Link to="/admin" aria-label="Admin Dashboard" className="text-gray-800 hover:text-gray-500 transition-colors">
+                <Link to="/dashboard/secure/protected" aria-label="Admin Dashboard" className="text-gray-800 hover:text-gray-500 transition-colors">
                   <UserCog size={22} strokeWidth={1.5} />
                 </Link>
                 <button onClick={handleLogout} aria-label="Logout" className="text-rose-600 hover:text-rose-400 transition-colors">
@@ -219,7 +219,7 @@ export default function Nav() {
         <div className="p-6 bg-gray-50 flex items-center justify-center gap-8 border-t border-gray-100">
           {isAdmin ? (
             <>
-              <Link to="/admin" className="flex flex-col items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
+              <Link to="/dashboard/secure/protected" className="flex flex-col items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors">
                 <UserCog size={24} strokeWidth={1.5} />
                 <span className="text-xs uppercase tracking-widest font-medium">Admin</span>
               </Link>

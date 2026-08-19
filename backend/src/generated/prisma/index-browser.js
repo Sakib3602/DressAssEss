@@ -123,10 +123,130 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  phone: 'phone',
+  email: 'email',
   password: 'password',
-  isActive: 'isActive',
+  phone: 'phone',
   role: 'role',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CategoryScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  image: 'image',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProductScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  shortDescription: 'shortDescription',
+  brand: 'brand',
+  categoryId: 'categoryId',
+  images: 'images',
+  price: 'price',
+  discountPrice: 'discountPrice',
+  totalStock: 'totalStock',
+  material: 'material',
+  careInstructions: 'careInstructions',
+  isBestseller: 'isBestseller',
+  ratingAverage: 'ratingAverage',
+  ratingCount: 'ratingCount',
+  isActive: 'isActive',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProductVariantScalarFieldEnum = {
+  id: 'id',
+  productId: 'productId',
+  size: 'size',
+  color: 'color',
+  colorCode: 'colorCode',
+  stock: 'stock',
+  sku: 'sku'
+};
+
+exports.Prisma.ComboOfferScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  images: 'images',
+  originalPrice: 'originalPrice',
+  comboPrice: 'comboPrice',
+  isActive: 'isActive',
+  createdById: 'createdById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ComboItemScalarFieldEnum = {
+  id: 'id',
+  comboId: 'comboId',
+  productId: 'productId',
+  variantId: 'variantId',
+  size: 'size',
+  color: 'color',
+  quantity: 'quantity'
+};
+
+exports.Prisma.OrderScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  shippingFullName: 'shippingFullName',
+  shippingPhone: 'shippingPhone',
+  shippingAddressLine: 'shippingAddressLine',
+  shippingCity: 'shippingCity',
+  shippingArea: 'shippingArea',
+  shippingPostalCode: 'shippingPostalCode',
+  guestEmail: 'guestEmail',
+  itemsPrice: 'itemsPrice',
+  shippingPrice: 'shippingPrice',
+  discountAmount: 'discountAmount',
+  totalPrice: 'totalPrice',
+  paymentMethod: 'paymentMethod',
+  isPaid: 'isPaid',
+  orderStatus: 'orderStatus',
+  deliveredAt: 'deliveredAt',
+  cancelReason: 'cancelReason',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.OrderItemScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  productId: 'productId',
+  variantId: 'variantId',
+  name: 'name',
+  image: 'image',
+  size: 'size',
+  color: 'color',
+  quantity: 'quantity',
+  price: 'price'
+};
+
+exports.Prisma.PaymentScalarFieldEnum = {
+  id: 'id',
+  orderId: 'orderId',
+  userId: 'userId',
+  amount: 'amount',
+  method: 'method',
+  status: 'status',
+  transactionId: 'transactionId',
+  gatewayResponse: 'gatewayResponse',
+  paidAt: 'paidAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -136,17 +256,64 @@ exports.Prisma.SortOrder = {
   desc: 'desc'
 };
 
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
+};
+
 exports.Prisma.QueryMode = {
   default: 'default',
   insensitive: 'insensitive'
 };
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
+};
 exports.Role = exports.$Enums.Role = {
-  USER: 'USER',
-  ADMIN: 'ADMIN'
+  ADMIN: 'ADMIN',
+  CUSTOMER: 'CUSTOMER'
+};
+
+exports.PaymentMethod = exports.$Enums.PaymentMethod = {
+  COD: 'COD',
+  BKASH: 'BKASH',
+  NAGAD: 'NAGAD',
+  CARD: 'CARD'
+};
+
+exports.OrderStatus = exports.$Enums.OrderStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  SHIPPED: 'SHIPPED',
+  DELIVERED: 'DELIVERED',
+  CANCELLED: 'CANCELLED',
+  RETURNED: 'RETURNED'
+};
+
+exports.PaymentStatus = exports.$Enums.PaymentStatus = {
+  PENDING: 'PENDING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED',
+  REFUNDED: 'REFUNDED'
 };
 
 exports.Prisma.ModelName = {
-  User: 'User'
+  User: 'User',
+  Category: 'Category',
+  Product: 'Product',
+  ProductVariant: 'ProductVariant',
+  ComboOffer: 'ComboOffer',
+  ComboItem: 'ComboItem',
+  Order: 'Order',
+  OrderItem: 'OrderItem',
+  Payment: 'Payment'
 };
 
 /**
