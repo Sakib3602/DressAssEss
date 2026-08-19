@@ -3,33 +3,29 @@ import { Link, Outlet, useLocation } from "react-router-dom";
 import { 
   Activity, 
   Home, 
-  LayoutGrid, 
-  CreditCard, 
+  ShoppingBag, 
+  PlusCircle, 
+  Package, 
   Users, 
   FileText, 
-  BarChart2, 
-  Bell, 
-  CircleHelp, 
-  Settings, 
+  CreditCard, 
+  Truck,
+  Settings,
   LogOut, 
   Menu,
   X
 } from "lucide-react";
 
-// মেইন মেন্যু আইটেমগুলোর লিস্ট
+// মেইন মেন্যু আইটেমগুলোর লিস্ট এবং সঠিক আইকন
 const mainNavItems = [
   { label: "Dashboard", to: "/dashboard", icon: <Home size={19} /> },
-  { label: "Orders", to: "/dashboard/orders", icon: <LayoutGrid size={19} /> },
+  { label: "Orders", to: "/dashboard/secure/protected/orders", icon: <ShoppingBag size={19} /> },
+  { label: "Add Product", to: "/dashboard/secure/protected/add-products", icon: <PlusCircle size={19} /> },
+  { label: "Inventory", to: "/dashboard/secure/protected/all-products", icon: <Package size={19} /> },
+  { label: "Customers", to: "/dashboard/secure/protected/all-customers", icon: <Users size={19} /> },
   { label: "Payments", to: "/dashboard/payments", icon: <CreditCard size={19} /> },
-  { label: "Customers", to: "/dashboard/customers", icon: <Users size={19} /> },
-  { label: "Reports", to: "/dashboard/reports", icon: <FileText size={19} /> },
-  { label: "Statistic", to: "/dashboard/statistic", icon: <BarChart2 size={19} /> },
-];
-
-// সাব-মেন্যু আইটেমগুলোর লিস্ট (ডিভাইডারের নিচের অংশ)
-const subNavItems = [
-  { label: "Notification", to: "/dashboard/notifications", icon: <Bell size={19} /> },
-  { label: "Help", to: "/dashboard/help", icon: <CircleHelp size={19} /> },
+  { label: "Reports", to: "/dashboard/secure/protected/reports", icon: <FileText size={19} /> },
+  { label: "Steadfast Courier", to: "/dashboard/secure/protected/steadfast", icon: <Truck size={19} /> },
   { label: "Settings", to: "/dashboard/settings", icon: <Settings size={19} /> },
 ];
 
@@ -38,8 +34,13 @@ export default function AdminHome() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => {
-    if (path === "/dashboard/orders" && (location.pathname === "/" || location.pathname === "/dashboard/orders")) return true;
-    return location.pathname.includes(path);
+    // ড্যাশবোর্ড হোমের জন্য এক্সট্রা চেক
+    if (path === "/dashboard" && location.pathname === "/dashboard") return true;
+    // অন্য রাউটগুলোর জন্য ইনক্লুডস চেক
+    if (path !== "/dashboard") {
+      return location.pathname.includes(path);
+    }
+    return false;
   };
 
   return (
@@ -52,7 +53,7 @@ export default function AdminHome() {
       <div className="lg:hidden flex items-center justify-between px-4 py-3 bg-[#1A1F2B] rounded-2xl border border-slate-800">
         <div className="flex items-center gap-2 text-white">
           <Activity className="w-6 h-6 text-white" />
-          <span className="text-lg font-bold tracking-wide">ProfitPulse</span>
+          <span className="text-lg font-bold tracking-wide">DressAssEss</span>
         </div>
         <button 
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -72,11 +73,11 @@ export default function AdminHome() {
           {/* Logo (Desktop) */}
           <div className="hidden lg:flex items-center gap-3 px-3 pt-2 text-white">
             <Activity className="w-6 h-6 text-white" />
-            <span className="text-lg xl:text-xl font-bold tracking-wide">ProfitPulse</span>
+            <span className="text-lg xl:text-xl font-bold tracking-wide">DressAssEss</span>
           </div>
 
           {/* মেনু আইটেমস (Mapped) */}
-          <nav className="flex flex-col gap-1">
+          <nav className="flex flex-col gap-1 overflow-y-auto pb-4 custom-scrollbar">
             
             {/* Main Menu Map */}
             {mainNavItems.map((item) => (
@@ -92,18 +93,6 @@ export default function AdminHome() {
 
             {/* ডিভাইডার */}
             <div className="my-4 mx-3 border-t border-slate-800/80"></div>
-
-            {/* Sub Menu Map */}
-            {subNavItems.map((item) => (
-              <NavItem 
-                key={item.label}
-                icon={item.icon} 
-                label={item.label} 
-                to={item.to} 
-                active={isActive(item.to)} 
-                onClick={() => setMobileMenuOpen(false)} 
-              />
-            ))}
             
           </nav>
         </div>
@@ -141,12 +130,12 @@ export default function AdminHome() {
             <div className="flex items-center gap-3 ml-1 pl-1">
               <img 
                 src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=150&auto=format&fit=crop" 
-                alt="Kristina Evans" 
+                alt="Admin User" 
                 className="w-10 h-10 rounded-full object-cover ring-2 ring-white shadow-xs" 
               />
               <div className="hidden sm:block">
-                <div className="font-bold text-xs md:text-sm text-[#141821]">Kristina Evans</div>
-                <div className="text-slate-400 text-[11px] font-medium leading-tight">kris.evans@gmail.com</div>
+                <div className="font-bold text-xs md:text-sm text-[#141821]">Admin User</div>
+                <div className="text-slate-400 text-[11px] font-medium leading-tight">admin@dressassess.com</div>
               </div>
             </div>
           </div>

@@ -10,6 +10,11 @@ import { AuthProvider } from "../AUTH/Authcontext";
 import ADMINPROTECTED from "../Components/AdminDashboard/ADMINPROTECTED/ADMINPROTECTED";
 import AdminHome from "../Components/AdminDashboard/AdminHome";
 import AdminDashboard from "../Components/AdminDashboard/AdminDashboard";
+import AdminOrders from "../Components/AdminDashboard/AdminOrders";
+import AdminAddProduct from "../Components/AdminDashboard/AdminAddProduct";
+import AdminAllProducts from "../Components/AdminDashboard/AdminAllProducts";
+import AdminCustomers from "../Components/AdminDashboard/AdminCustomers";
+import AdminReport from "../Components/AdminDashboard/AdminReport";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +41,13 @@ const RoutesAll = () => {
               }
             >
               <Route index element={<AdminDashboard />} />
+              <Route path="orders" element={<AdminOrders />} />
+              <Route path="add-products" element={<AdminAddProduct />} />
+              <Route path="all-products" element={<AdminAllProducts />} />
+              <Route path="all-customers" element={<AdminCustomers />} />
+              <Route path="reports" element={<AdminReport />} />
+
+
             </Route>
           </Routes>
 
