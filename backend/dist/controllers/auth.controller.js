@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.logout = exports.getMe = exports.login = exports.register = void 0;
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const prisma_js_1 = __importDefault(require("../config/prisma.js"));
@@ -62,3 +62,39 @@ const login = async (req, res) => {
     }
 };
 exports.login = login;
+// @desc   বর্তমানে cookie দিয়ে কে login করা আছে সেটা চেক করা — page refresh এর পর
+//         frontend AuthContext এইটা কল করে login state ধরে রাখবে
+// @route  GET /api/auth/me
+const getMe = async (req, res) => {
+    try {
+        const token = req.cookies?.token;
+        if (!token) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+        const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+        const user = await prisma_js_1.default.user.findUnique({
+            where: { id: decoded.id },
+            select: { id: true, name: true, phone: true, role: true, isActive: true },
+        });
+        if (!user || !user.isActive) {
+            return res.status(401).json({ message: "Not authenticated" });
+        }
+        res.status(200).json({ user });
+    }
+    catch (error) {
+        return res.status(401).json({ message: "Not authenticated" });
+    }
+};
+exports.getMe = getMe;
+// @desc   Logout — cookie clear করে দেয়
+// @route  POST /api/auth/logout
+const logout = async (req, res) => {
+    res.clearCookie("token", {
+        httpOnly: true,
+        secure: false,
+        sameSite: "lax",
+        path: "/",
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+};
+exports.logout = logout;

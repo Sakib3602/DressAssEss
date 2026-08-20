@@ -46,7 +46,7 @@ const RoutesAll = () => {
               <Route path="all-products" element={<AdminAllProducts />} />
               <Route path="all-customers" element={<AdminCustomers />} />
               <Route path="reports" element={<AdminReport />} />
-
+              <Route path="admin-all-products" element={<AdminAllProducts />} />
 
             </Route>
           </Routes>
